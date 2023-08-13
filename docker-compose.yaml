@@ -1,0 +1,17 @@
+services:
+  mahai:
+    container_name: mahai
+    build:
+      context: .
+      dockerfile: ./mahai/Dockerfile
+    ports:
+      - '6767:6767'
+    restart: always
+  front:
+    container_name: front
+    build:
+      context: .
+      dockerfile: ./front/Dockerfile
+    ports:
+      - '3000:3000'
+    restart: always

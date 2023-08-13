@@ -1,0 +1,11 @@
+onnx==1.14.0
+onnxruntime==1.15.1
+omegaconf==2.3.0
+opencv-python==4.8.0.76
+tqdm==4.66.1
+numpy==1.25.2
+einops==0.6.1
+flask>=0.8
+flask-restful==0.3.10
+waitress
+flask-cors

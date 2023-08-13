@@ -1,0 +1,154 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  title: 'Self-Hosting with Docker',
+  description: 'Learn how to configure and deploy Supabase with Docker.',
+  subtitle: 'Learn how to configure and deploy Supabase with Docker.',
+}
+
+Docker is the easiest way to get started with self-hosted Supabase. This guide assumes you are running the command from the machine you intend to host from.
+
+## Before you begin
+
+You need the following installed in your system: [Git](https://git-scm.com/downloads) and Docker ([Windows](https://docs.docker.com/desktop/install/windows-install/), [MacOS](https://docs.docker.com/desktop/install/mac-install/), or [Linux](https://docs.docker.com/desktop/install/linux-install/)).
+
+## Running Supabase
+
+Running a self-hosted Supabase project is simple. Follow the steps below:
+
+```sh
+# Get the code
+git clone --depth 1 https://github.com/supabase/supabase
+
+# Go to the docker folder
+cd supabase/docker
+
+# Copy the fake env vars
+cp .env.example .env
+
+# Start
+docker compose up
+```
+
+Now visit [localhost:3000](http://localhost:3000) to start using Supabase Studio.
+
+That's everything you need to get started. The rest of this guide will help you to customize your setup.
+
+## Securing your setup
+
+While we provided you with some example secrets for getting started, you should NEVER deploy your Supabase setup using the defaults we have provided.
+
+### Generate API Keys
+
+Create a new `JWT_SECRET` and store it securely. 
+
+We can use your JWT Secret to generate new `anon` and `service` API keys using the form below. Update the "JWT Secret" and then run "Generate JWT" once for the `SERVICE_KEY` and once for the `ANON_KEY`:
+
+<JwtGenerator />
+
+### Update API Keys
+
+Replace the values in the `.env` file:
+
+  - `ANON_KEY` - replace with an `anon` key
+  - `SERVICE_ROLE_KEY` - replace with a `service` key
+
+### Update Secrets
+
+Update the `.env` file with your own secrets. In particular, these are required:
+
+- `POSTGRES_PASSWORD`: the password for the `postgres` role.
+- `JWT_SECRET`: used by PostgREST and GoTrue, among others.
+- `SITE_URL`: the base URL of your site.
+- `SMTP_*`: mail server credentials. You can use any SMTP server.
+
+### Adding a firewall
+
+We recommend using a firewall to restrict access to your Supabase setup (something like `ufw`). One thing to highlight is that Docker usually [makes changes to your iptables](https://askubuntu.com/questions/652556/uncomplicated-firewall-ufw-is-not-blocking-anything-when-using-docker). 
+
+To disable this behavior, you can add the following to your `/etc/docker/daemon.json` file and then run `sudo service docker restart`:
+
+```json
+{
+  "iptables": false
+}
+```
+
+## Exposing services
+
+The services running on the machine are not exposed to the internet by default. We recommend using a reverse proxy such as [NGINX](https://www.nginx.com/) or [Caddy](https://caddyserver.com/) if you want to expose the services publicly:
+
+1. Install Caddy using the official [instructions](https://caddyserver.com/docs/install).
+2. Modify the `Caddyfile` at `./docker/deploy/caddy/Caddyfile`.
+    1. Replace `localhost` with your domain.
+    2. Uncomment the "Dashboard" section if you want to expose the Supabase Dashboard. You **MUST** set a password for this to be secure.
+3. Run `caddy run --config ./docker/deploy/caddy/Caddyfile` to start Caddy.
+
+You can now access your services at the following URLs:
+
+- REST: `https://<your-domain>/proxy/rest/v1/`
+- Auth: `https://<your-domain>/proxy/auth/v1/`
+- Storage: `https://<your-domain>/proxy/storage/v1/`
+- Functions: `https://<your-domain>/proxy/functions/v1/`
+- Realtime: `https://<your-domain>/proxy/realtime/v1/`
+- Dashboard: `https://<your-domain>/` (if you uncommented the Dashboard section in the Caddyfile)
+
+## Stop 
+
+You can stop Supabase by running `docker compose stop` in same directory as your `docker-compose.yml` file.
+
+## Uninstall
+
+You can stop Supabase by running `docker compose down -v` in same directory as your `docker-compose.yml` file.
+
+## Advanced configuration
+
+Each system can be [configured](../self-hosting#configuration) independently. Some of the most important configuration options are:
+
+- Consider deploying the database to a different server than the rest of the services
+- Update Storage to use S3 instead of the filesystem backend
+- Configure Auth with a production-ready SMTP server
+
+### Setting up Edge Functions
+
+Your Functions are stored in `volumes/functions`. The default setup has a `hello` Function that you can invoke on `http://localhost:8000/functions/v1/hello`. You can add new Functions as `volumes/functions/<Function name>/index.ts`.
+
+
+### Using an external database
+
+We strongly recommend [decoupling your database](../self-hosting#managing-your-database) from `docker-compose` before deploying.
+The middleware will run with any PostgreSQL database that has logical replication enabled. The following environment variables should be updated
+in the `.env` file to point to your external database:
+
+```bash .env
+POSTGRES_PASSWORD=your-super-secret-and-long-postgres-password
+
+POSTGRES_HOST=db
+POSTGRES_DB=postgres
+POSTGRES_USER=postgres
+POSTGRES_PORT=5432
+```
+
+Once you have done this, you can safely comment out the `db` section of the `docker-compose` file, and remove any instances where the services `depends_on` the `db` image.
+
+Supabase services require your external database to be initialized with a specific schema. Refer to our [postgres/migrations](https://github.com/supabase/postgres/tree/develop/migrations) repository for instructions on running these migrations.
+
+Note that you need superuser permission on the postgres role to perform the initial schema migration. Once completed, the postgres role will be demoted to non-superuser to prevent abuse.
+
+### Setting database's `log_min_messages`
+
+By default, `docker compose` sets the database's `log_min_messages` configuration to `fatal` to prevent redundant logs generated by Realtime.
+However, you might miss important log messages such as database errors. Configure `log_min_messages` based on your needs.
+
+### File storage backend on macOS
+
+By default, Storage backend is set to `file`, which is to use local files as the storage backend. To make it work on macOS, you need to choose `VirtioFS` as the Docker container file sharing implementation (in Docker Desktop -> Preferences -> General).
+
+### Setting up logging with the Analytics server
+
+Additional configuration is required for self-hosting the Analytics server. For the full setup instructions, see [Self Hosting Analytics](https://supabase.com/docs/reference/self-hosting-analytics/introduction#getting-started).
+
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

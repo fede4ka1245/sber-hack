@@ -1,0 +1,85 @@
+.scroll {
+    overflow-y: scroll;
+    scrollbar-width: thin;          /* "auto" or "thin" */
+}
+
+.scroll::-webkit-scrollbar-thumb {
+    background-color: orange;    /* color of the scroll thumb */
+    border-radius: 20px;       /* roundness of the scroll thumb */
+}
+
+.scroll::-webkit-scrollbar {
+    width: 10px;               /* width of the entire scrollbar */
+}
+
+.scroll::-webkit-scrollbar-track {
+    background: transparent;        /* color of the tracking area */
+}
+
+.app-header {
+    width: 100%;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    background: var(--text-light-birusa, #95D4D6);
+}
+
+.app-header-content {
+    width: 1380px;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+.app-header-text {
+    color: var(--extra-white, #FFF);
+    text-align: center;
+    font-family: Inter, sans-serif;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: normal;
+    letter-spacing: 0.3px;
+    border-radius: 15px;
+    background: var(--brand-colors-oxra, #FEAC00);
+    padding: 10px 10px;
+}
+
+.app-button {
+    border: none;
+    outline: none;
+    border-radius: 15px;
+    height: 50px;
+    color: var(--extra-white, #FFF);
+    text-align: center;
+    font-family: Inter, sans-serif;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: normal;
+    letter-spacing: 0.3px;
+    width: 100%;
+    cursor: pointer;
+    user-select: none;
+}
+
+.app-button:active {
+    opacity: 0.8;
+}
+
+.app-button:disabled {
+    background: gray;
+    pointer-events: none;
+}
+
+.app-orange-button {
+    background: var(--brand-colors-oxra, #FEAC00);
+}
+
+.app-purple-button {
+    background: var(--brand-colors-violet, #8F538F);
+}
+
+.app-danger-button {
+    background: var(--brand-colors-violet, #8F538F);
+}
