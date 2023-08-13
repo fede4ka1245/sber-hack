@@ -17,6 +17,6 @@ export const getStamps = async (url) => {
     redirect: 'follow'
   };
 
-  return fetch("http://0.0.0.0:6767/api/surdo_video", requestOptions)
+  return fetch("https://surdogram.ru/api/surdo_video", requestOptions)
     .then(response => response.json())
 }

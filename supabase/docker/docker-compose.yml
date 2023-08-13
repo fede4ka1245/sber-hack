@@ -17,7 +17,7 @@ services:
       interval: 5s
       retries: 3
     ports:
-      - ${STUDIO_PORT}:3000/tcp
+      - '3000:3000'
     environment:
       STUDIO_PG_META_URL: http://meta:8080
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}

@@ -12,6 +12,8 @@ services:
     build:
       context: .
       dockerfile: ./front/Dockerfile
+    environment:
+      PORT: 3030
     ports:
-      - '3000:3030'
+      - '3030:3030'
     restart: always
