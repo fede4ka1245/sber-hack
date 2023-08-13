@@ -13,5 +13,5 @@ services:
       context: .
       dockerfile: ./front/Dockerfile
     ports:
-      - '3000:3000'
+      - '3000:3030'
     restart: always
